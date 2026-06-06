@@ -4,7 +4,7 @@
 <%@page import="dao.DisasterDao"%>
 <%
     // Check if admin is logged in
-    String role = (String) session.getAttribute("user");
+    String role = (String) session.getAttribute("role");
     if (role == null || !role.equals("admin")) {
         response.sendRedirect("login.jsp?error=unauthorized");
         return;
@@ -107,7 +107,7 @@
     <div class="table-container">
         <div class="table-header">
             <h2><i class="fas fa-list"></i> Disaster Incidents</h2>
-            <button class="btn-add" onclick="openAddModal()">
+            <button class="btn-add" onclick="window.location.href='report-disaster.jsp'">
                 <i class="fas fa-plus"></i> Add New Disaster
             </button>
         </div>
@@ -617,7 +617,7 @@
             if (event.target.classList.contains('modal')) {
                 event.target.style.display = 'none';
             }
-        }
+        };
         
         // Load data on page load
         loadDisasters();

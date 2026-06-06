@@ -8,6 +8,7 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import model.Admin;
 import model.Volunteer;
 import util.DBConnection;
 
@@ -15,12 +16,11 @@ import util.DBConnection;
  *
  * @author junel
  */
-public class VolunteerDao {
-    
-    public Volunteer validateVolunteer(String username, String password){
-        Volunteer volunteer = new Volunteer();
+public class AdminDao {
+    public Admin validateAdmin(String username, String password){
+        Admin admin = new Admin();
         
-        String query = "SELECT * FROM volunteer WHERE username = ? AND password = ?";
+        String query = "SELECT * FROM admin_users WHERE username = ? AND password = ?";
         
         try (Connection conn = DBConnection.getConnection();
             PreparedStatement pstmt = conn.prepareStatement(query)) {
@@ -31,15 +31,15 @@ public class VolunteerDao {
             ResultSet rs = pstmt.executeQuery();
             
             if(rs.next()){
-                volunteer.setId(rs.getInt("id"));
-                volunteer.setUsername(rs.getString("username"));
-                volunteer.setName(rs.getString("name"));
-                volunteer.setPhoneNo(rs.getString("phoneNo"));
-                volunteer.setEmail(rs.getString("email"));
-                volunteer.setAddress(rs.getString("address"));
+                admin.setId(rs.getInt("id"));
+                admin.setUsername(rs.getString("username"));
+                admin.setPassword(rs.getString("password"));
+                admin.setPhone_number(rs.getString("phone_number"));
+                admin.setEmail(rs.getString("email"));
+                admin.setFull_name(rs.getString("full_name"));
             }
             
-            return volunteer;
+            return admin;
             
         } catch (SQLException e) {
             e.printStackTrace();

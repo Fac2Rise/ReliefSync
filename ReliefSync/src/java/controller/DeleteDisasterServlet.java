@@ -4,34 +4,22 @@
  */
 package controller;
 
-import dao.AdminDao;
-import dao.VolunteerDao;
 import java.io.IOException;
-import java.io.PrintWriter;
+import java.sql.SQLException;
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import javax.servlet.http.HttpSession;
-import model.Admin;
-import model.Volunteer;
-
+import dao.DisasterDao;
+import java.io.PrintWriter;
 /**
  *
  * @author junel
  */
-
-@WebServlet("/login")
-public class LoginServlet extends HttpServlet {
+public class DeleteDisasterServlet extends HttpServlet {
     
-    private VolunteerDao volunteerDAO;
-    private AdminDao adminDAO;
-    
-    public void init (){
-        volunteerDAO = new VolunteerDao();
-        adminDAO = new AdminDao();
-    }
+    private DisasterDao disasterDao = new DisasterDao();
 
     /**
      * Processes requests for both HTTP <code>GET</code> and <code>POST</code>
@@ -50,10 +38,10 @@ public class LoginServlet extends HttpServlet {
             out.println("<!DOCTYPE html>");
             out.println("<html>");
             out.println("<head>");
-            out.println("<title>Servlet LoginServlet</title>");
+            out.println("<title>Servlet DeleteDisasterServlet</title>");
             out.println("</head>");
             out.println("<body>");
-            out.println("<h1>Servlet LoginServlet at " + request.getContextPath() + "</h1>");
+            out.println("<h1>Servlet DeleteDisasterServlet at " + request.getContextPath() + "</h1>");
             out.println("</body>");
             out.println("</html>");
         }
@@ -83,42 +71,30 @@ public class LoginServlet extends HttpServlet {
      * @throws IOException if an I/O error occurs
      */
     @Override
-    protected void doPost(HttpServletRequest request, HttpServletResponse response)
+    protected void doDelete(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
-        String username = request.getParameter("username");
-        String password = request.getParameter("password");
-        String role = request.getParameter("role");
+        String idParam = request.getParameter("id");
         
-        // Validate user against the specific table based on role
-        System.out.println("Passed successfully " + username + password + role);
-        Volunteer volunteer = null;
-        Admin admin = null;
-        
-        if("Volunteer".equals(role)){
-            volunteer = volunteerDAO.validateVolunteer(username, password);
-        } else if("Admin".equals(role)){
-            admin = adminDAO.validateAdmin(username, password);
+        if (idParam == null || idParam.isEmpty()) {
+            response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
+            response.getWriter().write("{\"error\": \"ID required\"}");
+            return;
         }
         
-        if (volunteer != null) {
-            // Login successful
-            HttpSession session = request.getSession();
-            session.setAttribute("user", volunteer);
-            session.setAttribute("username", username);
-            session.setAttribute("role", "volunteer");
+        try {
+            int id = Integer.parseInt(idParam);
+            boolean deleted = disasterDao.deleteDisaster(id);
             
-            response.sendRedirect("volunteerDashboard.jsp");
-        } else if (admin != null) {
-            HttpSession session = request.getSession();
-            session.setAttribute("user", admin);
-            session.setAttribute("username", username);
-            session.setAttribute("role", "admin");
-            
-            response.sendRedirect("dashboard.jsp");
-        } else {
-            // Login failed
-            request.setAttribute("error", "Invalid username, password, or role");
-            request.getRequestDispatcher("login.jsp").forward(request, response);
+            if (deleted) {
+                response.getWriter().write("{\"success\": true}");
+            } else {
+                response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+                response.getWriter().write("{\"success\": false}");
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+            response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+            response.getWriter().write("{\"error\": \"" + e.getMessage() + "\"}");
         }
     }
 
