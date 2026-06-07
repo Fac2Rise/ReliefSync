@@ -61,5 +61,11 @@ public class TaskAssignController {
 
     }
     
+    @GetMapping("/hello")
+    public String hello(){
+         return("task is working");
+         
+    }
+    
 }
 
