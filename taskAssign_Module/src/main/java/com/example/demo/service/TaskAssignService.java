@@ -27,9 +27,7 @@ public class TaskAssignService {
     
     public String processTaskAssignment(Long volunteerId, Long disasterId, String description){
         
-        //logic 1:
-        
-        //logic 2: create new object and store in mysql
+        //logic 1: create new object and store in mysql
         TaskAssign newTask = new TaskAssign();
         newTask.setVolunteerId(volunteerId);
         newTask.setDisasterId(disasterId);
@@ -38,16 +36,22 @@ public class TaskAssignService {
         
         taskRepository.save(newTask); // use for insert to database
         
-        // logic 3: trigger notification system
-        NotificationMessageDTO notificationData = new NotificationMessageDTO();
-        notificationData.setTaskName("Task for disaster " + disasterId);
-        notificationData.setMessageBody("Alert: Volunteer " + volunteerId 
-                + "assigned to Disaster " + disasterId + ". Task: " +description);
+        // logic 2: trigger notification system
+        try{
+            NotificationMessageDTO notificationData = new NotificationMessageDTO();
+            notificationData.setTaskName("Task for disaster " + disasterId);
+            notificationData.setMessageBody("Alert: Volunteer " + volunteerId 
+                    + "assigned to Disaster " + disasterId + ". Task: " +description);
         
-        // s4end dto
-        rabbitTemplate.convertAndSend("task_queue", notificationData);
+            // send dto
+            rabbitTemplate.convertAndSend("task_queue", notificationData);
         
-        return "Task Assign successful stored and notification trigged";
+            return "Task Assign successful stored and notification trigged";
+        
+        } catch(Exception e){
+            System.out.println("RabbitMQ connect failed, not available to notify " + e.getMessage());
+            return "Task successfully saved to database, but RabbitMQ is down. Notification failed";
+        }
     }
     
     // Create function 

@@ -1,0 +1,278 @@
+/* Inherit your exact color variables */
+:root {
+    --purple-primary: #6B46C1;
+    --purple-dark: #553C9A;
+    --purple-ultra-light: #F3E8FF;
+    --white: #FFFFFF;
+    --gray-50: #F7FAFC;
+    --gray-100: #EDF2F7;
+    --gray-200: #E2E8F0;
+    --gray-600: #718096;
+    --gray-800: #2D3748;
+    --success: #48BB78;
+    --error: #F56565;
+}
+
+body {
+    background: var(--gray-100);
+    font-family: 'Inter', sans-serif;
+    margin: 0;
+}
+
+.volunteer-layout {
+    min-height: 100vh;
+}
+
+/* Header inherited from adminDashboard */
+.v-header {
+    background: linear-gradient(135deg, var(--purple-primary) 0%, var(--purple-dark) 100%);
+    color: white;
+    padding: 20px 30px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+}
+
+.v-header .logo {
+    font-size: 24px;
+    font-weight: 800;
+}
+
+.v-badge {
+    background: rgba(255,255,255,0.2);
+    padding: 6px 15px;
+    border-radius: 20px;
+    font-size: 13px;
+    margin-right: 15px;
+}
+
+.v-logout-btn {
+    background: transparent;
+    border: 1px solid white;
+    color: white;
+    padding: 6px 15px;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: 0.3s;
+}
+
+.v-logout-btn:hover {
+    background: white;
+    color: var(--purple-primary);
+}
+
+/* Main Container */
+.v-main-container {
+    max-width: 1200px;
+    margin: 30px auto;
+    padding: 0 20px;
+}
+
+/* Profile Card */
+.v-profile-card {
+    background: var(--white);
+    border-radius: 20px;
+    padding: 30px;
+    box-shadow: 0 10px 25px rgba(0,0,0,0.05);
+    margin-bottom: 30px;
+}
+
+.v-profile-header {
+    display: flex;
+    align-items: center;
+    gap: 25px;
+    flex-wrap: wrap;
+}
+
+.v-avatar {
+    width: 80px;
+    height: 80px;
+    background: var(--purple-ultra-light);
+    color: var(--purple-primary);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 35px;
+}
+
+.v-profile-info {
+    flex: 1;
+}
+
+.v-profile-info h2 {
+    color: var(--gray-800);
+    margin-bottom: 8px;
+    font-size: 26px;
+}
+
+.v-profile-info p {
+    color: var(--gray-600);
+    margin-bottom: 5px;
+    font-size: 15px;
+}
+
+.v-profile-info i {
+    color: var(--purple-primary);
+    width: 20px;
+}
+
+.btn-edit-profile {
+    background: var(--purple-primary);
+    color: white;
+    border: none;
+    padding: 10px 20px;
+    border-radius: 10px;
+    cursor: pointer;
+    font-weight: 600;
+    transition: 0.3s;
+}
+
+.btn-edit-profile:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 15px rgba(107, 70, 193, 0.3);
+}
+
+/* Tasks Table */
+.v-tasks-section {
+    background: var(--white);
+    border-radius: 20px;
+    padding: 30px;
+    box-shadow: 0 10px 25px rgba(0,0,0,0.05);
+}
+
+.v-section-title {
+    margin-bottom: 20px;
+    color: var(--gray-800);
+}
+
+.v-section-title i {
+    color: var(--purple-primary);
+    margin-right: 10px;
+}
+
+.v-table-container {
+    overflow-x: auto;
+}
+
+table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+th, td {
+    padding: 15px;
+    text-align: left;
+    border-bottom: 1px solid var(--gray-200);
+}
+
+th {
+    background: var(--gray-50);
+    color: var(--gray-800);
+    font-weight: 600;
+}
+
+.status-badge {
+    padding: 5px 12px;
+    border-radius: 20px;
+    font-size: 12px;
+    font-weight: 600;
+}
+
+.status-active { background: #FEF3C7; color: #D97706; }
+.status-resolved { background: #D1FAE5; color: var(--success); }
+
+/* Modal Design (inherited from admin-disasters.css) */
+.v-modal-overlay {
+    position: fixed;
+    top: 0; left: 0; width: 100%; height: 100%;
+    background: rgba(0,0,0,0.5);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 1000;
+}
+
+.v-modal-content {
+    background: white;
+    width: 100%;
+    max-width: 500px;
+    border-radius: 20px;
+    animation: slideUp 0.3s ease;
+}
+
+@keyframes slideUp {
+    from { opacity: 0; transform: translateY(30px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+.v-modal-header {
+    padding: 20px;
+    border-bottom: 1px solid var(--gray-200);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.v-close-btn {
+    background: none;
+    border: none;
+    font-size: 24px;
+    cursor: pointer;
+    color: var(--gray-600);
+}
+
+.v-modal-body {
+    padding: 20px;
+}
+
+.v-form-group {
+    margin-bottom: 15px;
+}
+
+.v-form-group label {
+    display: block;
+    margin-bottom: 8px;
+    color: var(--gray-800);
+    font-weight: 500;
+    font-size: 14px;
+}
+
+.v-form-group input {
+    width: 100%;
+    padding: 12px;
+    border: 1px solid var(--gray-300);
+    border-radius: 10px;
+    font-family: inherit;
+}
+
+.v-form-group input:focus {
+    outline: none;
+    border-color: var(--purple-primary);
+}
+
+.v-modal-footer {
+    padding: 20px;
+    border-top: 1px solid var(--gray-200);
+    display: flex;
+    justify-content: flex-end;
+    gap: 10px;
+}
+
+.btn-cancel {
+    background: var(--gray-200);
+    border: none;
+    padding: 10px 20px;
+    border-radius: 8px;
+    cursor: pointer;
+}
+
+.btn-save {
+    background: var(--purple-primary);
+    color: white;
+    border: none;
+    padding: 10px 20px;
+    border-radius: 8px;
+    cursor: pointer;
+}

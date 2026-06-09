@@ -20,21 +20,21 @@ import java.util.List;
 // automatically return JSON format.
 @RestController 
 @RequestMapping("/api/tasks") // Base URL path
+@CrossOrigin(origins = "*")
 public class TaskAssignController {
     
     @Autowired // Automatically inject the database repository you just created
     private TaskAssignService taskService;
     
-    
-    
     // 1. Create function (post)
     @PostMapping("/assign")
-    public String addTask(
-            @RequestParam Long volunteerId,
-            @RequestParam Long disasterId,
-            @RequestParam String description){
-        // let service handle the logic
-        return taskService.processTaskAssignment(volunteerId, disasterId, description);
+    public String addTask( @RequestBody TaskAssign taskData){
+        //React send the JSON and spring boot change JSON to taskData
+        return taskService.processTaskAssignment(
+                taskData.getVolunteerId(), 
+                taskData.getDisasterId(), 
+                taskData.getDescription()
+        );
     }
     
     // 2. Read function (get)
@@ -48,9 +48,9 @@ public class TaskAssignController {
     @PutMapping("/update/{id}")
     public TaskAssign updateTaskStatus(
             @PathVariable("id") Long taskId,
-            @RequestParam String newStatus){
-        // let service to edit
-        return taskService.updateTaskStatus(taskId, newStatus);
+            @RequestBody TaskAssign taskData){
+        // get new status from JSON and give to service
+        return taskService.updateTaskStatus(taskId, taskData.getStatus());
     }
     
     // delete function (delete)
