@@ -218,8 +218,8 @@ td {
 }
 
 /* Responsive for smaller screens */
-@media (max-width: 968px) {
+@media (min-width: 1200px) {
     .ta-content-grid {
-        grid-template-columns: 1fr;
+        grid-template-columns: 1fr 1fr 1.2fr !important;
     }
 }

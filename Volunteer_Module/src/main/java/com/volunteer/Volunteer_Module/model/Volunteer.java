@@ -11,7 +11,7 @@ package com.volunteer.Volunteer_Module.model;
 import jakarta.persistence.*;
 
 @Entity
-@Table(name = "volunteer")
+@Table(name = "volunteers")
 public class Volunteer {
     
     @Id
