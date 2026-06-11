@@ -1,0 +1,162 @@
+version: '3.8'
+
+services:
+  # ========== Databases ==========
+  mysql-auth:
+    image: mysql:8.0
+    container_name: mysql-auth
+    environment:
+      MYSQL_ROOT_PASSWORD: admin
+      MYSQL_DATABASE: auth_db
+    ports:
+      - "3306:3306"
+    volumes:
+      - auth-data:/var/lib/mysql
+    networks:
+      - relief-net
+
+  mysql-volunteer:
+    image: mysql:8.0
+    container_name: mysql-volunteer
+    environment:
+      MYSQL_ROOT_PASSWORD: admin
+      MYSQL_DATABASE: volunteer_db
+    ports:
+      - "3307:3306"
+    volumes:
+      - volunteer-data:/var/lib/mysql
+    networks:
+      - relief-net
+
+  mysql-disaster:
+    image: mysql:8.0
+    container_name: mysql-disaster
+    environment:
+      MYSQL_ROOT_PASSWORD: admin
+      MYSQL_DATABASE: disaster_db
+    ports:
+      - "3308:3306"
+    volumes:
+      - disaster-data:/var/lib/mysql
+    networks:
+      - relief-net
+
+  mysql-task:
+    image: mysql:8.0
+    container_name: mysql-task
+    environment:
+      MYSQL_ROOT_PASSWORD: admin
+      MYSQL_DATABASE: relief_sync_db
+    ports:
+      - "3309:3306"
+    volumes:
+      - task-data:/var/lib/mysql
+    networks:
+      - relief-net
+
+  rabbitmq:
+    image: rabbitmq:3-management
+    container_name: rabbitmq
+    ports:
+      - "5672:5672"
+      - "15672:15672"
+    networks:
+      - relief-net
+
+  # ========== Backend Microservices ==========
+  auth-service:
+    build: ./Auth-module
+    container_name: auth-service
+    ports:
+      - "8081:8081"
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:mysql://mysql-auth:3306/auth_db?useSSL=false&serverTimezone=UTC
+      SPRING_DATASOURCE_USERNAME: root
+      SPRING_DATASOURCE_PASSWORD: admin
+    depends_on:
+      - mysql-auth
+    networks:
+      - relief-net
+
+  volunteer-service:
+    build: ./Volunteer_Module
+    container_name: volunteer-service
+    ports:
+      - "8082:8082"
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:mysql://mysql-volunteer:3306/volunteer_db?useSSL=false&serverTimezone=UTC
+      SPRING_DATASOURCE_USERNAME: root
+      SPRING_DATASOURCE_PASSWORD: admin
+    depends_on:
+      - mysql-volunteer
+    networks:
+      - relief-net
+
+  disaster-service:
+    build: ./disaster_module
+    container_name: disaster-service
+    ports:
+      - "8083:8083"
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:mysql://mysql-disaster:3306/disaster_db?useSSL=false&serverTimezone=UTC
+      SPRING_DATASOURCE_USERNAME: root
+      SPRING_DATASOURCE_PASSWORD: admin
+    depends_on:
+      - mysql-disaster
+    networks:
+      - relief-net
+
+  task-service:
+    build: ./taskAssign_Module
+    container_name: task-service
+    ports:
+      - "8084:8084"
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:mysql://mysql-task:3306/relief_sync_db?useSSL=false&serverTimezone=UTC
+      SPRING_DATASOURCE_USERNAME: root
+      SPRING_DATASOURCE_PASSWORD: admin
+      SPRING_RABBITMQ_HOST: rabbitmq
+    depends_on:
+      - mysql-task
+      - rabbitmq
+    networks:
+      - relief-net
+
+  api-gateway:
+    build: ./api-gateway
+    container_name: api-gateway
+    ports:
+      - "8080:8080"
+    environment:
+      AUTH_SERVICE_URL: http://auth-service:8081
+      VOLUNTEER_SERVICE_URL: http://volunteer-service:8082
+      DISASTER_SERVICE_URL: http://disaster-service:8083
+      TASK_SERVICE_URL: http://task-service:8084
+    depends_on:
+      - auth-service
+      - volunteer-service
+      - disaster-service
+      - task-service
+    networks:
+      - relief-net
+
+  # ========== Frontend React ==========
+  frontend:
+    build: ./SPA
+    container_name: react-frontend
+    ports:
+      - "80:80"
+    depends_on:
+      - api-gateway
+    networks:
+      - relief-net
+
+networks:
+  relief-net:
+    driver: bridge
+
+volumes:
+  auth-data:
+  volunteer-data:
+  disaster-data:
+  task-data:
