@@ -17,6 +17,11 @@ import javax.servlet.http.HttpSession;
 import model.Admin;
 import model.Volunteer;
 
+import io.jsonwebtoken.Jwts;
+import io.jsonwebtoken.security.Keys;
+import java.util.Date;
+import javax.crypto.SecretKey;
+
 /**
  *
  * @author junel
@@ -28,6 +33,7 @@ public class LoginServlet extends HttpServlet {
     private VolunteerDao volunteerDAO;
     private AdminDao adminDAO;
     
+    @Override
     public void init (){
         volunteerDAO = new VolunteerDao();
         adminDAO = new AdminDao();
@@ -107,6 +113,15 @@ public class LoginServlet extends HttpServlet {
             session.setAttribute("username", username);
             session.setAttribute("role", "volunteer");
             
+//            String token = generateToken(username, role);
+            
+            // API Gateway Section
+//            response.setContentType("application/json");
+//            response.setStatus(HttpServletResponse.SC_OK);
+//            PrintWriter out = response.getWriter();
+//            out.println(String.format("{\"token\":\"%s\",\"expires_in\":%d}", token, EXPIRATION_TIME));
+//            out.flush();
+            
             response.sendRedirect("volunteerDashboard.jsp");
         } else if (admin != null) {
             HttpSession session = request.getSession();
@@ -114,9 +129,26 @@ public class LoginServlet extends HttpServlet {
             session.setAttribute("username", username);
             session.setAttribute("role", "admin");
             
+//            String token = generateToken(username, role);
+            
+//            // API Gateway Section
+//            response.setContentType("application/json");
+//            response.setStatus(HttpServletResponse.SC_OK);
+//            PrintWriter out = response.getWriter();
+//            out.println(String.format("{\"token\":\"%s\",\"expires_in\":%d}", token, EXPIRATION_TIME));
+//            out.flush();
+            
             response.sendRedirect("dashboard.jsp");
         } else {
             // Login failed
+            
+            // API Gateway Section
+//            response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+//            response.setContentType("application/json");
+//            PrintWriter out = response.getWriter();
+//            out.println("{\"error\":\"Invalid username or password\"}");
+//            out.flush();
+            
             request.setAttribute("error", "Invalid username, password, or role");
             request.getRequestDispatcher("login.jsp").forward(request, response);
         }
@@ -132,4 +164,13 @@ public class LoginServlet extends HttpServlet {
         return "Short description";
     }// </editor-fold>
 
+//    private String generateToken(String username, String role) {
+//        return Jwts.builder()
+//                .subject(username)
+//                .issuedAt(new Date())
+//                .expiration(new Date(System.currentTimeMillis() + EXPIRATION_TIME))
+//                .claim("role", role)  // Add custom claims
+//                .signWith(SECRET_KEY)
+//                .compact();
+//    }
 }

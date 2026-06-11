@@ -9,7 +9,6 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import model.Admin;
-import model.Volunteer;
 import util.DBConnection;
 
 /**

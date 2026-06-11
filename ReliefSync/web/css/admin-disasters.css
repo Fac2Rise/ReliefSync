@@ -179,6 +179,10 @@ body {
     cursor: pointer;
 }
 
+.btn-filter:hover {
+    background: var(--purple-dark);
+}
+
 /* Table Container */
 .table-container {
     background: var(--white);
@@ -214,6 +218,10 @@ body {
     align-items: center;
     gap: 8px;
     font-weight: 500;
+}
+
+.btn-add:hover {
+    background: #38A169;
 }
 
 table {
@@ -256,7 +264,7 @@ td {
     gap: 8px;
 }
 
-.btn-edit, .btn-delete, .btn-view {
+.btn-view, .btn-edit, .btn-delete {
     padding: 6px 12px;
     border: none;
     border-radius: 6px;
@@ -370,6 +378,11 @@ td {
     border-color: var(--purple-primary);
 }
 
+.form-row {
+    display: flex;
+    gap: 15px;
+}
+
 .modal-footer {
     padding: 20px;
     border-top: 1px solid var(--gray-200);
@@ -452,5 +465,9 @@ td {
     }
     .action-buttons {
         flex-direction: column;
+    }
+    .form-row {
+        flex-direction: column;
+        gap: 0;
     }
 }
