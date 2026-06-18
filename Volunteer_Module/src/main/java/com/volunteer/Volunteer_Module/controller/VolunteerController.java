@@ -8,7 +8,6 @@ package com.volunteer.Volunteer_Module.controller;
  *
  * @author fuyan_iqg
  */
-
 import com.volunteer.Volunteer_Module.model.Volunteer;
 import com.volunteer.Volunteer_Module.service.VolunteerService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -18,42 +17,48 @@ import java.util.List;
 @RestController
 @RequestMapping("/api/volunteers")
 public class VolunteerController {
-    
+
     @Autowired
     private VolunteerService volunteerService;
-    
+
     @PostMapping("/add")
-    public String addVolunteer(@RequestBody Volunteer volunteerData){
+    public String addVolunteer(@RequestBody Volunteer volunteerData) {
         return volunteerService.processVolunteer(
-            volunteerData.getName(),
-            volunteerData.getSkill(),
-            volunteerData.getEmail()
+                volunteerData.getName(),
+                volunteerData.getSkill(),
+                volunteerData.getEmail()
         );
     }
-            
+
     @GetMapping("/all")
-    public List<Volunteer>getAllVolunteer(){
+    public List<Volunteer> getAllVolunteer() {
         return volunteerService.getAllVolunteer();
     }
-    
+
     @PutMapping("/update/{id}")
     public Volunteer updateVolunteer(
-        @PathVariable("id")Long volunteerId,
-        @RequestBody Volunteer volunteerData){
-        
+            @PathVariable("id") Long volunteerId,
+            @RequestBody Volunteer volunteerData) {
+
         return volunteerService.updateVolunteer(volunteerId, volunteerData);
     }
-    
+
     @DeleteMapping("/delete/{id}")
-    public String deleteVolunteer(@PathVariable("id")Long volunteerId){
+    public String deleteVolunteer(@PathVariable("id") Long volunteerId) {
         volunteerService.deleteVolunteer(volunteerId);
         return "Volunteer" + volunteerId + "has been successfully deleted.";
     }
-    
+
     @GetMapping("/hello")
-    public String hello(){
-         return("volunteer is working");
-         
+    public String hello() {
+        return ("volunteer is working");
+
     }
-    
+
+    @GetMapping("/{id}")
+    public Volunteer getVolunteerById(@PathVariable("id") Long volunteerId) {
+
+        return volunteerService.getVolunteerById(volunteerId);
+
+    }
 }

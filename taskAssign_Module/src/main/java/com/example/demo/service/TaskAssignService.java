@@ -82,6 +82,11 @@ public class TaskAssignService {
         return taskRepository.findById(id).orElse(null);
         // find with id
     }
+    
+    public List<TaskAssign> getTasksByVolunteerId(Long volunteerId) {
+        
+        return taskRepository.findByVolunteerId(volunteerId); 
+    }
 
     //Update function
     public TaskAssign updateTaskStatus(Long taskId, String newStatus) {
@@ -128,7 +133,6 @@ public class TaskAssignService {
             createdTasks.add(newTask);
         }
 
-        // 3. 發送 RabbitMQ 通知（一次性通知所有志工）
         try {
             NotificationMessageDTO notification = new NotificationMessageDTO();
             notification.setTaskName("New Task for Disaster " + disasterId);
@@ -142,12 +146,10 @@ public class TaskAssignService {
         }
     }
 
-// 輔助方法：透過 API Gateway 呼叫 Volunteer Module 取得 email
     private String fetchVolunteerEmail(Long volunteerId) {
         try {
-            // 注意：這裡直接呼叫 Volunteer Module 的 API（可經由 Gateway 或直連）
-            // 若使用 Gateway: http://localhost:8080/api/volunteers/{id}
-            String url = "http://localhost:8082/api/volunteers/" + volunteerId;
+            
+            String url = "http://volunteer-service:8082/api/volunteers/" + volunteerId;
             ResponseEntity<Map> response = restTemplate.getForEntity(url, Map.class);
             if (response.getBody() != null && response.getBody().containsKey("email")) {
                 return (String) response.getBody().get("email");

@@ -74,5 +74,11 @@ public class TaskAssignController {
                 request.getDescription()
         );
     }
+    
+    @GetMapping("/volunteer/{volunteerId}")
+    public List<TaskAssign> getTasksByVolunteerId(@PathVariable("volunteerId") Long volunteerId) {
+
+        return taskService.getTasksByVolunteerId(volunteerId);
+    }
 
 }

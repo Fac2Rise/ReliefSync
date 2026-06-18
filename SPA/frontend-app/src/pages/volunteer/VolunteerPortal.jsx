@@ -1,10 +1,10 @@
 // File: src/pages/VolunteerDashboard/VolunteerPortal.jsx
 import React, { useState, useEffect } from 'react';
-import './volunteer-dashboard.css'; // Use the CSS I provided previously
+import { useNavigate } from 'react-router-dom'; 
+import './volunteer-dashboard.css';
 
 const VolunteerPortal = () => {
-    // We assume the user ID is saved in localStorage during Login
-    const currentUserId = localStorage.getItem("userId") || 1; // Default to 1 for testing
+    const navigate = useNavigate();
 
     const [profile, setProfile] = useState({});
     const [tasks, setTasks] = useState([]);
@@ -12,31 +12,71 @@ const VolunteerPortal = () => {
     const [editForm, setEditForm] = useState({});
 
     useEffect(() => {
-        fetchMyProfile();
-        fetchMyTasks();
+        // 🚀 在 useEffect 內部即時獲取，確保此時 localStorage 已經完全寫入
+        const token = localStorage.getItem("token");
+        const currentUserId = localStorage.getItem("userId");
+
+        if (!token || !currentUserId) {
+            console.log("未檢測到合法的 Token 或 ID，正在安全跳轉...");
+            navigate('/login');
+            return;
+        }
+        
+        // 將動態拿到的最正確 ID 與 Token 傳給 fetch 函數
+        fetchMyProfile(currentUserId, token);
+        fetchMyTasks(currentUserId, token);
     }, []);
 
     // 1. Fetch own profile from Volunteer Module
-    const fetchMyProfile = () => {
-        // Assume you create a getById API in Volunteer controller
-        fetch(`http://localhost:8080/api/volunteers/${currentUserId}`)
-            .then(res => res.json())
-            .then(data => setProfile(data))
-            .catch(err => console.error("Error fetching profile", err));
+    const fetchMyProfile = (userId, token) => {
+        fetch(`http://localhost:8080/api/volunteers/${userId}`, {
+            method: 'GET',
+            headers: {
+                'Authorization': `Bearer ${token}`,
+                'Content-Type': 'application/json'
+            }
+        })
+            .then(res => {
+                if (!res.ok) throw new Error(`HTTP Error Status: ${res.status}`);
+                return res.json();
+            })
+            .then(data => {
+                console.log("成功動態加載志工資料:", data);
+                setProfile(data);
+            })
+            .catch(err => {
+                console.error("Error fetching profile:", err);
+            });
     };
 
-    // 2. Fetch assigned tasks from TASK ASSIGN MODULE (Port 8083 via Gateway 8080)
-    const fetchMyTasks = () => {
-        // Call the Task module API. You will need to create this endpoint in TaskController 
-        // to filter tasks by volunteerId.
-        fetch(`http://localhost:8080/api/tasks/volunteer/${currentUserId}`)
-            .then(res => res.json())
-            .then(data => setTasks(data))
-            .catch(err => console.error("Error fetching tasks", err));
+    // 2. Fetch assigned tasks from TASK ASSIGN MODULE
+    const fetchMyTasks = (userId, token) => {
+        fetch(`http://localhost:8080/api/tasks/volunteer/${userId}`, {
+            method: 'GET',
+            headers: {
+                'Authorization': `Bearer ${token}`,
+                'Content-Type': 'application/json'
+            }
+        })
+            .then(res => {
+                if (!res.ok) throw new Error(`HTTP Error Status: ${res.status}`);
+                return res.json();
+            })
+            .then(data => {
+                console.log("成功動態加載任務清單:", data);
+                setTasks(data);
+            })
+            .catch(err => console.error("Error fetching tasks:", err));
     };
 
+    // 打開編輯視窗時，把目前拿到的 profile 塞進表單裡
     const openEditModal = () => {
-        setEditForm(profile); 
+        setEditForm({
+            volunteerId: profile.volunteerId || '',
+            name: profile.name || '',
+            email: profile.email || '',
+            skill: profile.skill || ''
+        });
         setIsEditModalOpen(true);
     };
 
@@ -47,18 +87,29 @@ const VolunteerPortal = () => {
     // 3. Update own profile to Volunteer Module
     const handleUpdateProfile = (e) => {
         e.preventDefault();
-        fetch(`http://localhost:8080/api/volunteers/update/${currentUserId}`, {
+        
+        // 🚀 每次觸發更新時，重新獲取最新的 ID 與 通行證，避免未定義錯誤
+        const activeUserId = localStorage.getItem("userId");
+        const activeToken = localStorage.getItem("token");
+
+        fetch(`http://localhost:8080/api/volunteers/update/${activeUserId}`, {
             method: 'PUT',
-            headers: { 'Content-Type': 'application/json' },
+            headers: {
+                'Authorization': `Bearer ${activeToken}`,
+                'Content-Type': 'application/json'
+            },
             body: JSON.stringify(editForm)
         })
-        .then(res => res.json())
-        .then(updatedData => {
-            setProfile(updatedData);
-            setIsEditModalOpen(false);
-            alert("Profile updated successfully!");
-        })
-        .catch(err => alert("Error updating profile."));
+            .then(res => {
+                if (!res.ok) throw new Error("Update failed");
+                return res.json();
+            })
+            .then(updatedData => {
+                setProfile(updatedData); 
+                setIsEditModalOpen(false); 
+                alert("Profile updated successfully!");
+            })
+            .catch(err => alert("Error updating profile. Please try again."));
     };
 
     return (
@@ -71,7 +122,7 @@ const VolunteerPortal = () => {
             </header>
 
             <main className="v-main-container">
-                {/* PROFILE SECTION (Can update) */}
+                {/* PROFILE SECTION */}
                 <section className="v-profile-card">
                     <div className="v-profile-header">
                         <div className="v-avatar"><i className="fas fa-user"></i></div>
@@ -86,7 +137,7 @@ const VolunteerPortal = () => {
                     </div>
                 </section>
 
-                {/* TASKS SECTION (View only, data comes from Task Module) */}
+                {/* TASKS SECTION */}
                 <section className="v-tasks-section">
                     <div className="v-section-title">
                         <h3><i className="fas fa-clipboard-list"></i> My Assigned Tasks</h3>
@@ -132,15 +183,15 @@ const VolunteerPortal = () => {
                             <div className="v-modal-body">
                                 <div className="v-form-group">
                                     <label>Full Name</label>
-                                    <input type="text" name="name" value={editForm.name || ''} onChange={handleInputChange} required />
+                                    <input type="text" name="name" value={editForm.name} onChange={handleInputChange} required />
                                 </div>
                                 <div className="v-form-group">
                                     <label>Email Address</label>
-                                    <input type="email" name="email" value={editForm.email || ''} onChange={handleInputChange} required />
+                                    <input type="email" name="email" value={editForm.email} onChange={handleInputChange} required />
                                 </div>
                                 <div className="v-form-group">
                                     <label>Specialized Skills</label>
-                                    <input type="text" name="skill" value={editForm.skill || ''} onChange={handleInputChange} required />
+                                    <input type="text" name="skill" value={editForm.skill} onChange={handleInputChange} required />
                                 </div>
                             </div>
                             <div className="v-modal-footer">

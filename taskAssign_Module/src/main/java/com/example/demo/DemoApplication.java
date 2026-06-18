@@ -15,7 +15,7 @@ public class DemoApplication {
 
     @Bean
     public Queue taskQueue() {
-        // true 代表这是一个持久化队列（重启 RabbitMQ 后队列不会消失）
+        
         return new Queue("task_queue", true);
     }
 

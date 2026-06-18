@@ -6,25 +6,37 @@ spring:
     name: api-gateway
   cloud:
     gateway:
+      # CORS 跨域設定
+      globalcors:
+        corsConfigurations:
+          '[/**]':
+            allowedOrigins: 
+              - "http://localhost"
+              - "http://localhost:80"
+            allowedMethods: "*"
+            allowedHeaders: "*"
+            allowCredentials: true
+            
+      # 🚨 關鍵修復：這裡必須要有 server 和 webmvc 這兩層！
       server:
-        webmvc:  
+        webmvc:
           routes:
             - id: auth_service
-              uri: http://localhost:8081
+              uri: http://auth-service:8081
               predicates:
                 - Path=/api/auth/**
 
             - id: volunteer_module
-              uri: http://localhost:8082
+              uri: http://volunteer-service:8082
               predicates:
                 - Path=/api/volunteers/**
               
             - id: disaster_module
-              uri: http://localhost:8083
+              uri: http://disaster-service:8083
               predicates:
                 - Path=/api/disasters/**
 
             - id: task-assign-module
-              uri: http://localhost:8084
+              uri: http://task-service:8084
               predicates:
                 - Path=/api/tasks/**

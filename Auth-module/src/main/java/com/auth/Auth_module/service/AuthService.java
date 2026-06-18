@@ -100,7 +100,7 @@ public class AuthService {
             volunteerRequest.put("skill", skill);
 
             // localhost:8082
-            String volunteerServiceUrl = "http://localhost:8082/api/volunteers/add";
+            String volunteerServiceUrl = "http://volunteer-service:8082/api/volunteers/add";
 
             // send post request
             String response = restTemplate.postForObject(volunteerServiceUrl, volunteerRequest, String.class);
