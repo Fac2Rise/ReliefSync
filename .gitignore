@@ -3,3 +3,14 @@
 /ReliefSync/dist/
 /taskAssign_Module/target
 /taskAssign_Module/target
+*.class
+*.class
+taskAssign_Module/target/maven-archiver/pom.properties
+*.class
+*.class
+*.class
+*.class
+*.class
+*.class
+*.class
+*.properties
